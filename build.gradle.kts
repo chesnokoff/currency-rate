@@ -15,6 +15,14 @@ allprojects {
 }
 
 subprojects {
+    plugins.withId("io.spring.dependency-management") {
+        the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
+            imports {
+                mavenBom("org.springframework.cloud:spring-cloud-dependencies:2025.1.1")
+            }
+        }
+    }
+
     plugins.withId("java") {
         extensions.configure<JavaPluginExtension> {
             toolchain {
