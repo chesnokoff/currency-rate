@@ -1,6 +1,7 @@
 package com.example.rate_printer.job;
 
-import com.example.rate_printer.dto.RateDTO;
+import java.time.LocalDate;
+import com.example.rate_printer.dto.RatesMultiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,20 +21,22 @@ public class PrinterJob {
     @Scheduled(fixedDelayString = "${printer.period-ms:5000}")
     public void printRate() {
         try {
-            RateDTO rateDTO = client.get()
+            RatesMultiResponse ratesMultiResponse = client.get()
                 .uri(uri -> uri.path("/rate")
-                    .queryParam("base", "USD")
-                    .queryParam("target", "RUB")
+                    .queryParam("pair", "USD/RUB")
+                    .queryParam("pair", "USD/EUR")
+                    .queryParam("since", LocalDate.now().minusDays(3))
+                    .queryParam("until", LocalDate.now())
                     .build())
                 .retrieve()
-                .body(RateDTO.class);
+                .body(RatesMultiResponse.class);
 
-            if (rateDTO == null) {
+            if (ratesMultiResponse == null) {
                 log.warn("Server returned empty body");
                 return;
             }
 
-            log.info("Received currency rate: {}", rateDTO);
+            log.info("Received currency rate: {}", ratesMultiResponse);
         }
         catch (Exception e) {
             log.error("Could not fetch rate", e);
