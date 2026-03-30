@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: rate-provider
+    metrics_path: /actuator/prometheus
+    consul_sd_configs:
+      - server: host.docker.internal:8500
+        services:
+          - rate-provider
+
+  - job_name: rate-printer
+    metrics_path: /actuator/prometheus
+    consul_sd_configs:
+      - server: host.docker.internal:8500
+        services:
+          - rate-printer
+
+  - job_name: consul-metrics
+    metrics_path: /v1/agent/metrics
+    params:
+      format:
+        - prometheus
+    static_configs:
+      - targets:
+          - host.docker.internal:8500
