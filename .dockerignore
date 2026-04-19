@@ -1,0 +1,13 @@
+.git
+.github
+.gradle
+.idea
+.run
+rate-provider/build
+rate-printer/build
+build/artifacts
+img
+monitoring/grafana
+monitoring/prometheus/prometheus.yml
+pact-broker
+service-registry

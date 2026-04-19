@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:17
+    healthcheck:
+      test: psql postgres --command "select 1" -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+
+  pact-broker:
+    image: pactfoundation/pact-broker:2.138.0-pactbroker2.119.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PACT_BROKER_DATABASE_ADAPTER: postgres
+      PACT_BROKER_DATABASE_HOST: postgres
+      PACT_BROKER_DATABASE_NAME: postgres
+      PACT_BROKER_DATABASE_USERNAME: postgres
+      PACT_BROKER_DATABASE_PASSWORD: password
+      PACT_BROKER_PORT: 9292
+    ports:
+      - "9292:9292"
+
+volumes:
+  postgres-volume:
