@@ -1,0 +1,40 @@
+services:
+  consul:
+    image: hashicorp/consul:1.17
+    command: [agent, -server, -bootstrap-expect=1, -ui, -client=0.0.0.0, -bind=0.0.0.0, -node=consul-1, -data-dir=/consul/data]
+    ports:
+      - "8500:8500"
+
+  rate-provider:
+    build:
+      context: .
+      dockerfile: docker/rate-provider.Dockerfile
+      args:
+        RELEASE_ID: ${RELEASE_ID:-}
+    environment:
+      SERVER_PORT: 8085
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    depends_on:
+      - consul
+    ports:
+      - "8085:8085"
+    stop_grace_period: 30s
+
+  rate-printer:
+    build:
+      context: .
+      dockerfile: docker/rate-printer.Dockerfile
+      args:
+        RELEASE_ID: ${RELEASE_ID:-}
+    environment:
+      SERVER_PORT: 8083
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      RATE_PROVIDER_SERVICE_URL: http://rate-provider
+    depends_on:
+      - consul
+      - rate-provider
+    ports:
+      - "8083:8083"
+    stop_grace_period: 30s

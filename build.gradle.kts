@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = "org.example"
-    version = "1.0-SNAPSHOT"
+    version = findProperty("releaseVersion")?.toString() ?: "1.0.0"
 
     repositories {
         mavenCentral()
